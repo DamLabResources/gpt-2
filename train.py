@@ -9,8 +9,12 @@ import numpy as np
 import tensorflow as tf
 import random
 import time
-
+import glob
 import model, sample, encoder
+
+import os
+os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"   # see issue #152
+os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
 CHECKPOINT_DIR = 'checkpoint'
 SAMPLE_DIR = 'samples'
@@ -100,7 +104,7 @@ def train_main(dataset,
                sample_every=100,
                run_name='run1',
                restore_from='latest',
-               save_every=1000):
+               save_every=100):
 
     enc = encoder.get_encoder(model_name)
     hparams = model.default_hparams()

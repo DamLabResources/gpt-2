@@ -10,10 +10,22 @@ import numpy as np
 import tensorflow as tf
 import random
 import time
-import tqdm
+#import tqdm
 import glob
 
 import encoder
+import docx
+
+
+def extract_text(doc_path):
+
+    doc = docx.Document(doc_path)
+
+    raw_text = ''
+    for par in doc.paragraphs:
+        raw_text += par.text
+
+    return raw_text
 
 
 def load_dataset(enc, path):
@@ -31,11 +43,29 @@ def load_dataset(enc, path):
         paths = glob.glob(path)
 
     token_chunks = []
-    for path in tqdm.tqdm(paths):
-        with open(path, 'r') as fp:
-            raw_text = fp.read()
-        tokens = np.stack(enc.encode(raw_text))
-        token_chunks.append(tokens)
+    found = 0
+    total_chars = 0
+    for path in paths:
+
+        #if path.endswith('.txt'):
+        #    with open(path, 'r') as fp:
+        #        raw_text = fp.read()
+        if path.endswith('.docx'):
+            raw_text = extract_text(path)
+        else:
+            continue
+
+        if raw_text:
+            print(path)
+            found += 1
+            total_chars += len(raw_text)
+            tokens = np.stack(enc.encode(raw_text))
+            token_chunks.append(tokens)
+
+            #if found > 200:
+            #    print('Dropping after %i chars' % total_chars)
+            #    break
+
     return token_chunks
 
 
